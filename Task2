@@ -1,0 +1,201 @@
+/*Features of the System
+Add Student:
+
+Users can input a new student's ID, name, subject marks, and grades are calculated automatically.
+Display Students:
+
+Displays a table of all students with their ID, name, and grade.
+Edit Student:
+
+Users can modify existing student details, including marks and name.
+Delete Student:
+
+Deletes a student record based on their ID.
+Grade Calculation:
+
+Calculates grades automatically based on average marks using a defined grading scale.
+*/
+
+
+
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <iomanip> // for std::setw
+
+using namespace std;
+
+// Struct to hold student details
+struct Student {
+    int id;
+    string name;
+    vector<float> marks;
+    char grade;
+};
+
+// Function prototypes
+void addStudent(vector<Student>& students);
+void displayStudents(const vector<Student>& students);
+void editStudent(vector<Student>& students);
+void deleteStudent(vector<Student>& students);
+char calculateGrade(float average);
+
+int main() {
+    vector<Student> students;
+    int choice;
+
+    do {
+        cout << "\n===== Student Management System =====\n";
+        cout << "1. Add Student\n";
+        cout << "2. Display Students\n";
+        cout << "3. Edit Student\n";
+        cout << "4. Delete Student\n";
+        cout << "5. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                addStudent(students);
+                break;
+            case 2:
+                displayStudents(students);
+                break;
+            case 3:
+                editStudent(students);
+                break;
+            case 4:
+                deleteStudent(students);
+                break;
+            case 5:
+                cout << "Exiting the system. Goodbye!\n";
+                break;
+            default:
+                cout << "Invalid choice! Please try again.\n";
+        }
+    } while (choice != 5);
+
+    return 0;
+}
+
+// Function to add a new student
+void addStudent(vector<Student>& students) {
+    Student newStudent;
+    cout << "\nEnter Student ID: ";
+    cin >> newStudent.id;
+    cin.ignore(); // Clear the input buffer
+    cout << "Enter Student Name: ";
+    getline(cin, newStudent.name);
+
+    int numSubjects;
+    cout << "Enter number of subjects: ";
+    cin >> numSubjects;
+    newStudent.marks.resize(numSubjects);
+
+    cout << "Enter marks for each subject:\n";
+    for (int i = 0; i < numSubjects; ++i) {
+        cout << "Subject " << i + 1 << ": ";
+        cin >> newStudent.marks[i];
+    }
+
+    // Calculate grade based on average marks
+    float total = 0;
+    for (float mark : newStudent.marks) {
+        total += mark;
+    }
+    float average = total / numSubjects;
+    newStudent.grade = calculateGrade(average);
+
+    students.push_back(newStudent);
+    cout << "Student added successfully!\n";
+}
+
+// Function to display all students
+void displayStudents(const vector<Student>& students) {
+    if (students.empty()) {
+        cout << "No students found!\n";
+        return;
+    }
+
+    cout << "\nStudent Records:\n";
+    cout << setw(5) << "ID" << setw(20) << "Name" << setw(10) << "Grade" << "\n";
+    cout << "-----------------------------------------\n";
+
+    for (const auto& student : students) {
+        cout << setw(5) << student.id 
+             << setw(20) << student.name 
+             << setw(10) << student.grade << "\n";
+    }
+}
+
+// Function to edit student details
+void editStudent(vector<Student>& students) {
+    int id;
+    cout << "\nEnter Student ID to edit: ";
+    cin >> id;
+
+    for (auto& student : students) {
+        if (student.id == id) {
+            cout << "Editing details for " << student.name << ":\n";
+            cout << "Enter new name (leave empty to keep current name): ";
+            cin.ignore();
+            string newName;
+            getline(cin, newName);
+            if (!newName.empty()) {
+                student.name = newName;
+            }
+
+            cout << "Enter number of subjects: ";
+            int numSubjects;
+            cin >> numSubjects;
+            student.marks.resize(numSubjects);
+
+            cout << "Enter marks for each subject:\n";
+            for (int i = 0; i < numSubjects; ++i) {
+                cout << "Subject " << i + 1 << ": ";
+                cin >> student.marks[i];
+            }
+
+            // Recalculate grade
+            float total = 0;
+            for (float mark : student.marks) {
+                total += mark;
+            }
+            float average = total / numSubjects;
+            student.grade = calculateGrade(average);
+
+            cout << "Student details updated successfully!\n";
+            return;
+        }
+    }
+
+    cout << "Student with ID " << id << " not found!\n";
+}
+
+// Function to delete a student record
+void deleteStudent(vector<Student>& students) {
+    int id;
+    cout << "\nEnter Student ID to delete: ";
+    cin >> id;
+
+    for (auto it = students.begin(); it != students.end(); ++it) {
+        if (it->id == id) {
+            cout << "Deleting record for " << it->name << ".\n";
+            students.erase(it);
+            cout << "Student deleted successfully!\n";
+            return;
+        }
+    }
+
+    cout << "Student with ID " << id << " not found!\n";
+}
+
+// Function to calculate grade based on average marks
+char calculateGrade(float average) {
+    if (average >= 90) return 'A';
+    if (average >= 80) return 'B';
+    if (average >= 70) return 'C';
+    if (average >= 60) return 'D';
+    return 'F';
+}
